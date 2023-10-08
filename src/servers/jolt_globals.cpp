@@ -1,6 +1,7 @@
 #include "jolt_globals.hpp"
 
 #include "objects/jolt_group_filter.hpp"
+#include "shapes/jolt_chunk_shape_impl_3d.hpp"
 #include "shapes/jolt_custom_double_sided_shape.hpp"
 #include "shapes/jolt_custom_empty_shape.hpp"
 #include "shapes/jolt_custom_ray_shape.hpp"
@@ -67,6 +68,7 @@ void jolt_initialize() {
 	JoltCustomRayShape::register_type();
 	JoltCustomUserDataShape::register_type();
 	JoltCustomDoubleSidedShape::register_type();
+	JoltCustomChunkShape::register_type();
 
 	JoltGroupFilter::instance = new JoltGroupFilter();
 	JoltGroupFilter::instance->SetEmbedded();
