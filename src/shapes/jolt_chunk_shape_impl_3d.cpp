@@ -99,9 +99,8 @@ void JoltCustomChunkShape::register_type() {
 		JPH::EShapeSubType::Capsule,
 		JPH::EShapeSubType::TaperedCapsule,
 		JPH::EShapeSubType::Cylinder,
-		JPH::EShapeSubType::ConvexHull,
-		JPH::EShapeSubType::Mesh,
-		JPH::EShapeSubType::HeightField};
+		JPH::EShapeSubType::ConvexHull
+	};
 
 	for (const JPH::EShapeSubType concrete_sub_type : concrete_sub_types) {
 		JPH::CollisionDispatch::sRegisterCollideShape(
@@ -128,12 +127,8 @@ bool JoltCustomChunkShape::CastRay(
 		return false;
 	}
 
-	auto to_gd_vec3 = [](const JPH::Vec3& vec3) {
-		return Vector3(vec3.GetX(), vec3.GetY(), vec3.GetZ());
-	};
-
 	// Fast Voxel Traversal
-	Vector3 d = to_gd_vec3(inRay.mDirection);
+	Vector3 d = to_godot(inRay.mDirection);
 	Vector3 dnorm = d.normalized();
 	real_t t = 0.0;
 	Vector3i ind;
