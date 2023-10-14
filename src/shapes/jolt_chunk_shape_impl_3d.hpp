@@ -16,7 +16,7 @@ public:
 		return JPH::AABox(JPH::Vec3(0.0f, 0.0f, 0.0f), JPH::Vec3((float)size, (float)size, (float)size));
 	}
 
-	virtual JPH::uint GetSubShapeIDBitsRecursive() const override { return 1; }
+	virtual JPH::uint GetSubShapeIDBitsRecursive() const override { return 0; }
 
 	virtual float GetInnerRadius() const override { return size * 0.5f; }
 
@@ -137,7 +137,7 @@ public:
 	const uint8_t* blocks = nullptr;
 
 	// Store raycast normals since they are all that is needed from GetSurfaceNormal
-	mutable JPH::Vec3 last_ray_normal;
+	mutable JPH::Vec3 last_ray_normal = JPH::Vec3::sZero();
 };
 
 class JoltChunkShapeImpl3D final : public JoltShapeImpl3D {

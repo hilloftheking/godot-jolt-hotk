@@ -8,7 +8,7 @@ JPH::Shape* construct_chunk() {
 	return new JoltCustomChunkShape();
 }
 
-void collide_chunk_vs_shape(
+void collide_shape_vs_chunk(
 	const JPH::Shape* p_shape1,
 	const JPH::Shape* p_shape2,
 	[[maybe_unused]] JPH::Vec3Arg p_scale1,
@@ -21,18 +21,20 @@ void collide_chunk_vs_shape(
 	JPH::CollideShapeCollector& p_collector,
 	const JPH::ShapeFilter& p_shape_filter
 ) {
-	ERR_FAIL_COND(p_shape1->GetSubType() != JoltCustomShapeSubType::CHUNK);
+	ERR_FAIL_COND(p_shape2->GetSubType() != JoltCustomShapeSubType::CHUNK);
 
-	const auto* chunk = static_cast<const JoltCustomChunkShape*>(p_shape1);
+	const auto* chunk = static_cast<const JoltCustomChunkShape*>(p_shape2);
 	if (!chunk->blocks || !chunk->size) {
 		// Chunk has not been configured yet
 		return;
 	}
 
-	// Translation of transforms seem to be in relation to the non-static shape (shape2)
-	JPH::AABox local_aabb = p_shape2->GetWorldSpaceBounds(p_center_of_mass_transform2, p_scale2);
-	// transform1's translation will be the offset from transform2
-	local_aabb.Translate(-p_center_of_mass_transform1.GetTranslation());
+	// Get AABB in world space first. For some reason JoltCustomMotionShape::GetWorldSpaceBounds is unimplemented.
+	JPH::AABox local_aabb = p_shape1->GetLocalBounds().Scaled(p_scale1).Transformed(
+		p_center_of_mass_transform1
+	);
+	// Now translate it to be local to the chunk
+	local_aabb.Translate(-p_center_of_mass_transform2.GetTranslation());
 
 	// Each block in [start, end) is checked
 	Vector3i start;
@@ -45,8 +47,8 @@ void collide_chunk_vs_shape(
 		end[i] = Math::clamp<int>(end[i], 0, chunk->size);
 	}
 
-	JPH::Vec3 half(0.5f, 0.5f, 0.5f);
-	JPH::BoxShape box_shape(half);
+	const JPH::Vec3 half(0.5f, 0.5f, 0.5f);
+	JPH::BoxShape box_shape(half, 0.0f, chunk->material);
 
 	for (int x = start.x; x < end.x; ++x) {
 		for (int y = start.y; y < end.y; ++y) {
@@ -59,16 +61,16 @@ void collide_chunk_vs_shape(
 
 				// Add half to box position because the position will be for the center of the box
 				JPH::Vec3 box_pos = JPH::Vec3((float)x, (float)y, (float)z) + half;
-				JPH::Mat44 box_trans = p_center_of_mass_transform1.PostTranslated(box_pos);
+				JPH::Mat44 box_trans = p_center_of_mass_transform2.PostTranslated(box_pos);
 
 				// Call built in collision function for BoxShape
 				JPH::CollisionDispatch::sCollideShapeVsShape(
+					p_shape1,
 					&box_shape,
-					p_shape2,
+					p_scale1,
 					JPH::Vec3(1, 1, 1),
-					p_scale2,
+					p_center_of_mass_transform1,
 					box_trans,
-					p_center_of_mass_transform2,
 					p_sub_shape_id_creator1,
 					p_sub_shape_id_creator2,
 					p_collide_shape_settings,
@@ -92,26 +94,16 @@ void JoltCustomChunkShape::register_type() {
 	shape_functions.mConstruct = construct_chunk;
 	shape_functions.mColor = JPH::Color::sDarkRed;
 
-	static constexpr JPH::EShapeSubType concrete_sub_types[] = {
-		JPH::EShapeSubType::Sphere,
-		JPH::EShapeSubType::Box,
-		JPH::EShapeSubType::Triangle,
-		JPH::EShapeSubType::Capsule,
-		JPH::EShapeSubType::TaperedCapsule,
-		JPH::EShapeSubType::Cylinder,
-		JPH::EShapeSubType::ConvexHull
-	};
-
-	for (const JPH::EShapeSubType concrete_sub_type : concrete_sub_types) {
+	for (const JPH::EShapeSubType s : JPH::sConvexSubShapeTypes) {
 		JPH::CollisionDispatch::sRegisterCollideShape(
+			s,
 			JoltCustomShapeSubType::CHUNK,
-			concrete_sub_type,
-			collide_chunk_vs_shape
+			collide_shape_vs_chunk
 		);
 
 		JPH::CollisionDispatch::sRegisterCollideShape(
-			concrete_sub_type,
 			JoltCustomShapeSubType::CHUNK,
+			s,
 			JPH::CollisionDispatch::sReversedCollideShape
 		);
 	}
