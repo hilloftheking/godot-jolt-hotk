@@ -9,15 +9,17 @@ Breaking changes are denoted with ⚠️.
 
 ## [Unreleased]
 
-### Added
-
-- Added new project setting, "Active Edge Threshold", for tuning the cut-off angle for Jolt's active
-  edge detection, which can help balance trade-offs related to triangle edge collisions.
+## [0.9.0] - 2023-10-12
 
 ### Changed
 
 - Changed `ConvexPolygonShape3D` to no longer emit errors about failing to build the shape when
   adding one to the scene tree with 0 points.
+
+### Added
+
+- Added new project setting, "Active Edge Threshold", for tuning the cut-off angle for Jolt's active
+  edge detection, which can help balance trade-offs related to triangle edge collisions.
 
 ### Fixed
 
@@ -271,7 +273,8 @@ Breaking changes are denoted with ⚠️.
 
 Initial release.
 
-[Unreleased]: https://github.com/godot-jolt/godot-jolt/compare/v0.8.0-stable...HEAD
+[Unreleased]: https://github.com/godot-jolt/godot-jolt/compare/v0.9.0-stable...HEAD
+[0.9.0]: https://github.com/godot-jolt/godot-jolt/compare/v0.8.0-stable...v0.9.0-stable
 [0.8.0]: https://github.com/godot-jolt/godot-jolt/compare/v0.7.0-stable...v0.8.0-stable
 [0.7.0]: https://github.com/godot-jolt/godot-jolt/compare/v0.6.0-stable...v0.7.0-stable
 [0.6.0]: https://github.com/godot-jolt/godot-jolt/compare/v0.5.0-stable...v0.6.0-stable
