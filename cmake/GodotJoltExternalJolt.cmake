@@ -25,9 +25,15 @@ set(dev_definitions
 	JPH_DEBUG_RENDERER
 )
 
+if(ANDROID)
+	set(override_cxx_flags_arg -DOVERRIDE_CXX_FLAGS=FALSE)
+else()
+	set(override_cxx_flags_arg "")
+endif()
+
 gdj_add_external_library(jolt "${configurations}"
 	GIT_REPOSITORY https://github.com/godot-jolt/jolt.git
-	GIT_COMMIT 7df682edda5dee5f0445ceba27513f9e623dd758
+	GIT_COMMIT 1fef92352095d501675e8514c4c7a7400c6d370c
 	LANGUAGE CXX
 	SOURCE_SUBDIR Build
 	OUTPUT_NAME Jolt
@@ -65,6 +71,7 @@ gdj_add_external_library(jolt "${configurations}"
 		-DUSE_SSE4_2=${GDJ_USE_SSE4_2}
 		-DUSE_SSE4_1=${GDJ_USE_SSE4_2}
 		-DUSE_STATIC_MSVC_RUNTIME_LIBRARY=${GDJ_STATIC_RUNTIME_LIBRARY}
+		${override_cxx_flags_arg}
 	LIBRARY_CONFIG_DEBUG Debug
 	LIBRARY_CONFIG_DEVELOPMENT Release
 	LIBRARY_CONFIG_DISTRIBUTION Distribution
