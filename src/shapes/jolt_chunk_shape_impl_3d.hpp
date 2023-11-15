@@ -18,7 +18,7 @@ public:
 
 	virtual JPH::uint GetSubShapeIDBitsRecursive() const override { return 0; }
 
-	virtual float GetInnerRadius() const override { return size * 0.5f; }
+	virtual float GetInnerRadius() const override { return (float) size * 0.5f; }
 
 	virtual JPH::MassProperties GetMassProperties() const override {
 		JPH::MassProperties mass_properties;
